@@ -1,0 +1,150 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Cement Silo Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        .silos {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 30px;
+        }
+        .silo-box {
+            background: white;
+            border: 1px solid #ccc;
+            padding: 15px;
+            width: 20%;
+            text-align: center;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #ddd;
+        }
+        .silo-fill {
+            height: 150px;
+            background: #eee;
+            position: relative;
+            margin: 10px 0;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .silo-level {
+            background: #4CAF50;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            text-align: center;
+            color: white;
+            font-weight: bold;
+        }
+        .form-box {
+            background: white;
+            border: 1px solid #ccc;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px #ddd;
+            max-width: 600px;
+            margin: 20px auto;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th, td {
+            padding: 8px;
+            border: 1px solid #999;
+            text-align: center;
+        }
+        input, select {
+            padding: 6px;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        .date-picker {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cement Silo Tracker</h1>
+
+    <div class="date-picker">
+        <form method="get">
+            <label>Select Date:</label>
+            <input type="date" name="date" value="{{ selected_date }}">
+            <button type="submit">View</button>
+        </form>
+    </div>
+
+    <div class="silos">
+        {% for name, data in silos.items() %}
+        <div class="silo-box">
+            <h3>{{ name }}</h3>
+            <div class="silo-fill">
+                <div class="silo-level" style="height: {{ (data.current / data.capacity) * 100 }}%;">
+                    {{ data.current }} / {{ data.capacity }} tons
+                </div>
+            </div>
+            <p>Start of Day: {{ inventory[name].start }} tons</p>
+            <p>End of Day: {{ inventory[name].end }} tons</p>
+        </div>
+        {% endfor %}
+    </div>
+
+    <div class="form-box">
+        <h3>Register Input/Output</h3>
+        <form method="post">
+            <label>Silo:</label>
+            <select name="silo">
+                {% for name in silos.keys() %}
+                <option value="{{ name }}">{{ name }}</option>
+                {% endfor %}
+            </select>
+            <label>Action:</label>
+            <select name="action">
+                <option value="input">Input</option>
+                <option value="output">Output</option>
+            </select>
+            <label>Amount (tons):</label>
+            <input type="number" name="amount" step="0.1" required>
+            <label>Date:</label>
+            <input type="date" name="date" value="{{ selected_date }}" required>
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <div class="form-box">
+        <h3>Daily History - {{ selected_date }}</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Silo</th>
+                    <th>Action</th>
+                    <th>Amount</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in history %}
+                <tr>
+                    <td>{{ entry.silo }}</td>
+                    <td>{{ entry.action }}</td>
+                    <td>{{ entry.amount }}</td>
+                    <td>{{ entry.date }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
